@@ -11,7 +11,7 @@ let Film = require('./film.model');
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://127.0.0.1:27017/films', { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true });
 const connection = mongoose.connection;
 
 connection.once('open', function() {
@@ -47,12 +47,10 @@ filmRoutes.route('/add').post(function(req, res) {
 });
 
 filmRoutes.route('/update/:id').post(function(req, res) {
-    console.log(req.params.id)
     Film.findById(req.params.id, function(err, film) {
         if (!film)
             res.status(404).send("data is not found");
         else
-        console.log(req.body)
             film.film_title = req.body.film_title;
             film.film_year = req.body.film_year;
             film.film_director = req.body.film_director;

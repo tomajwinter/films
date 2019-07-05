@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+  films-client:
+    container_name: films-client
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - '3000:3000'
+  films-api:
+    container_name: films-api
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - './backend:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGODB_URL=mongodb://mongodb:27017/films-dev
+  mongodb:
+    image: mongo:3.6.4
+    container_name: mongodb
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+  mongodb-seed:
+    build: ./db-seed
+    links:
+      - mongodb
